@@ -1,0 +1,22 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// Represents a shortened URL
+model Url {
+  id          String   @id @default(uuid())
+  shortCode   String   @unique
+  originalUrl String
+  createdAt   DateTime @default(now())
+
+  @@index([shortCode])
+  @@map("urls")
+}

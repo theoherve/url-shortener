@@ -32,6 +32,7 @@ coverage/
 # Prisma
 backend/prisma/*.db
 backend/prisma/*.db-journal
+backend/generated/
 
 # Misc
 *.tsbuildinfo
