@@ -1,14 +1,39 @@
 import type { CreateUrlResponse, GetUrlsResponse } from '../types/url';
 
-const API_BASE_URL = '/api';
+// Normaliser l'URL de l'API : s'assurer qu'elle est absolue ou relative correctement
+const getApiBaseUrl = (): string => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  
+  if (!envUrl) {
+    return '/api';
+  }
+  
+  // Si l'URL commence par http:// ou https://, c'est une URL absolue
+  // Utiliser l'URL telle quelle sans ajouter /api
+  if (envUrl.startsWith('http://') || envUrl.startsWith('https://')) {
+    // Retirer le slash final s'il existe pour éviter les doubles slashes
+    return envUrl.replace(/\/$/, '');
+  }
+  
+  // Sinon, traiter comme un chemin relatif
+  return envUrl.startsWith('/') ? envUrl : `/${envUrl}`;
+};
+
+const API_BASE_URL = getApiBaseUrl();
+
+// Debug: vérifier que la variable d'environnement est bien utilisée
+if (import.meta.env.DEV) {
+  console.log('API_BASE_URL:', API_BASE_URL);
+  console.log('VITE_API_URL:', import.meta.env.VITE_API_URL);
+}
 
 export class ApiError extends Error {
-  constructor(
-    public statusCode: number,
-    message: string,
-  ) {
+  statusCode: number;
+  
+  constructor(statusCode: number, message: string) {
     super(message);
     this.name = 'ApiError';
+    this.statusCode = statusCode;
   }
 }
 

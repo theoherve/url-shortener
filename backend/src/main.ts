@@ -6,11 +6,23 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Enable CORS for frontend
-  app.enableCors({
-    origin: ['http://localhost:5173', 'http://localhost:3000'],
-    methods: ['GET', 'POST'],
+  const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    process.env.FRONTEND_URL, // URL du frontend en production
+    'https://url-shortener-stoik.vercel.app', // Frontend Vercel
+  ].filter(Boolean); // Remove undefined values
+
+  // En production, si aucune origine n'est spécifiée, autoriser toutes les origines
+  // Sinon, utiliser la liste des origines autorisées
+  const corsOptions = {
+    origin: allowedOrigins.length > 0 ? allowedOrigins : true,
+    methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
-  });
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  };
+
+  app.enableCors(corsOptions);
 
   // Global validation pipe for DTOs
   app.useGlobalPipes(
@@ -21,10 +33,10 @@ async function bootstrap() {
     }),
   );
 
-  // Set global prefix for API routes, but exclude redirect route
-  app.setGlobalPrefix('api', {
-    exclude: [':shortCode'],
-  });
+  // // Set global prefix for API routes, but exclude redirect route
+  // app.setGlobalPrefix('api', {
+  //   exclude: [':shortCode'],
+  // });
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
