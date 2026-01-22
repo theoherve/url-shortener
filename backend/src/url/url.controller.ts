@@ -27,7 +27,10 @@ export class UrlController {
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() createUrlDto: CreateUrlDto) {
     const url = await this.urlService.create(createUrlDto);
-    const appUrl = this.configService.get<string>('APP_URL', 'http://localhost:3000');
+    const appUrl = this.configService.get<string>(
+      'APP_URL',
+      'http://localhost:3000',
+    );
 
     return {
       id: url.id,
@@ -44,7 +47,10 @@ export class UrlController {
   @Get('urls')
   async findAll() {
     const { urls, total } = await this.urlService.findAll();
-    const appUrl = this.configService.get<string>('APP_URL', 'http://localhost:3000');
+    const appUrl = this.configService.get<string>(
+      'APP_URL',
+      'http://localhost:3000',
+    );
 
     return {
       urls: urls.map((url) => ({
@@ -63,10 +69,7 @@ export class UrlController {
    * Uses HTTP 302 (temporary redirect) to allow future tracking
    */
   @Get(':shortCode')
-  async redirect(
-    @Param('shortCode') shortCode: string,
-    @Res() res: Response,
-  ) {
+  async redirect(@Param('shortCode') shortCode: string, @Res() res: Response) {
     // Validate shortCode format (alphanumeric, 6 chars)
     if (!/^[a-zA-Z0-9_-]{6}$/.test(shortCode)) {
       return res.status(HttpStatus.NOT_FOUND).json({
